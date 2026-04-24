@@ -21,4 +21,4 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
-      - run: node --test 'dist/__tests__/*.test.js'
+      - run: node scripts/run-tests.mjs
