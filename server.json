@@ -1,0 +1,70 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.yogiadhik/civicrm-mcp",
+  "description": "Model Context Protocol server for CiviCRM — AuthX-first, schema-introspected, write-gated.",
+  "repository": {
+    "url": "https://github.com/YogiAdhik/civicrm-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "civicrm-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CIVICRM_BASE_URL",
+          "description": "Base URL of the CiviCRM install, e.g. https://crm.example.org. No trailing slash.",
+          "isRequired": true,
+          "format": "string"
+        },
+        {
+          "name": "CIVICRM_API_KEY",
+          "description": "API key of the contact the server authenticates as. Keep it on a dedicated 'MCP Bot' contact with minimum permissions.",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true
+        },
+        {
+          "name": "CIVICRM_CMS",
+          "description": "CMS host: drupal, wordpress, standalone, or backdrop.",
+          "isRequired": false,
+          "format": "string",
+          "default": "drupal"
+        },
+        {
+          "name": "CIVICRM_SITE_KEY",
+          "description": "Optional — only needed if the site enables the AuthX site-key guard.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true
+        },
+        {
+          "name": "CIVICRM_AUTH_MODE",
+          "description": "authx (default, recommended) or legacy for pre-5.36 installs.",
+          "isRequired": false,
+          "format": "string",
+          "default": "authx"
+        },
+        {
+          "name": "CIVICRM_ALLOW_WRITES",
+          "description": "Set to 'true' to enable create / update / save / submit actions. Off by default.",
+          "isRequired": false,
+          "format": "string",
+          "default": "false"
+        },
+        {
+          "name": "CIVICRM_ALLOW_DELETES",
+          "description": "Set to 'true' to enable delete / replace actions. Off by default.",
+          "isRequired": false,
+          "format": "string",
+          "default": "false"
+        }
+      ]
+    }
+  ]
+}
