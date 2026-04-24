@@ -17,6 +17,10 @@ npm install
 npm run build
 ```
 
+## Don't have a CiviCRM yet?
+
+See [`docs/INSTALL_CIVICRM.md`](docs/INSTALL_CIVICRM.md) for a 20-minute guide to running CiviCRM Standalone locally via DDEV.
+
 ## Configure
 
 Generate an API key for a dedicated "MCP Bot" contact:
