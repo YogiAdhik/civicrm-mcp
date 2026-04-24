@@ -202,7 +202,7 @@ Introspection:
 1. Target a specific CiviCRM version floor? (Recommend **≥5.47** — AuthX stable, `extern/rest.php` removed.)
 2. Is the first target site Drupal, WordPress, or Standalone? Affects the URL builder test suite.
 3. Do we want to publish to npm under the user's name/org, or keep private?
-4. Desired MCP transport: stdio-only (Claude Desktop/Code) or also HTTP (n8n, Zapier-alike)?
+4. Desired MCP transport: stdio-only (local clients) or also HTTP (n8n, Zapier-alike)?
 
 ## 12. Sources
 

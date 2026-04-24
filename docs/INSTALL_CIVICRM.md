@@ -121,7 +121,7 @@ Note the `CIVICRM_CMS=standalone` — this is important; the URL builder uses it
 
 ## Step 7 — Smoke test
 
-Build, then ask Claude Desktop (or Claude Code) to run the `civicrm_system_info` tool. Expected output:
+Build, then ask your MCP client to run the `civicrm_system_info` tool. Expected output:
 
 ```
 CiviCRM: 5.79.x

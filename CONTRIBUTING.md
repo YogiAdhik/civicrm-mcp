@@ -22,7 +22,7 @@ For end-to-end checks you will need:
 - A dedicated "MCP Bot" contact with the minimum permissions you want to expose (`access CiviCRM`, `view all contacts`, `authenticate with api key`).
 - That contact's API key.
 
-Copy `.env.example` to `.env`, fill in the credentials, then run the server under an MCP client such as Claude Desktop or Claude Code (see `README.md`).
+Copy `.env.example` to `.env`, fill in the credentials, then run the server under any stdio-capable MCP client (see `README.md`).
 
 ## Adding a new tool
 

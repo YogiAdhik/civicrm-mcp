@@ -11,7 +11,7 @@ You can expect an acknowledgement within 72 hours and a first assessment within 
 
 ## Threat model
 
-This server is an **authenticated proxy** between an MCP client (such as Claude Desktop or Claude Code) and a CiviCRM install. Key properties in scope:
+This server is an **authenticated proxy** between an MCP client and a CiviCRM install. Key properties in scope:
 
 - The server should never write data unless the operator has explicitly opted in via `CIVICRM_ALLOW_WRITES=true`. Deletes require the separate `CIVICRM_ALLOW_DELETES=true`.
 - Credentials (`CIVICRM_API_KEY`, `CIVICRM_SITE_KEY`) must only leave the server inside the `Authorization` / `X-Civi-Key` headers of outbound HTTPS calls. They must not appear in logs, tool results, or error text passed back to the model.

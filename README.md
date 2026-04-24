@@ -1,6 +1,6 @@
 # civicrm-mcp
 
-A [Model Context Protocol](https://modelcontextprotocol.io) server for [CiviCRM](https://civicrm.org). Lets Claude Desktop, Claude Code, and other MCP-compatible clients talk to a CiviCRM install through its APIv4.
+A [Model Context Protocol](https://modelcontextprotocol.io) server for [CiviCRM](https://civicrm.org). Lets any MCP-compatible client talk to a CiviCRM install through its APIv4.
 
 **Status:** v0.1 — stdio transport, three tools, AuthX-first auth.
 
@@ -41,16 +41,16 @@ CIVICRM_ALLOW_WRITES=false    # writes off by default
 CIVICRM_ALLOW_DELETES=false   # deletes off by default
 ```
 
-## Use with Claude Desktop / Code
+## Wire up an MCP client
 
-Add to your MCP config (`~/Library/Application Support/Claude/claude_desktop_config.json` or the equivalent for Claude Code):
+Any MCP-compatible client that supports stdio servers can load this. Add an entry like the one below to your client's MCP configuration file:
 
 ```json
 {
   "mcpServers": {
     "civicrm": {
-      "command": "node",
-      "args": ["/absolute/path/to/civicrm-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "civicrm-mcp"],
       "env": {
         "CIVICRM_BASE_URL": "https://crm.example.org",
         "CIVICRM_CMS": "drupal",
@@ -61,6 +61,8 @@ Add to your MCP config (`~/Library/Application Support/Claude/claude_desktop_con
   }
 }
 ```
+
+Consult your client's documentation for where its MCP config file lives.
 
 ## Tools
 
