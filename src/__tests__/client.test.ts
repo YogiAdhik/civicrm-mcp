@@ -66,8 +66,10 @@ describe("CivicrmClient", () => {
     const headers = call.init.headers as Record<string, string>;
     assert.equal(headers.Authorization, "Bearer test-key");
     assert.equal(headers["X-Requested-With"], "XMLHttpRequest");
-    assert.equal(headers["Content-Type"], "application/json");
-    assert.equal(call.init.body, JSON.stringify({ limit: 1 }));
+    assert.equal(headers["Content-Type"], "application/x-www-form-urlencoded");
+    // APIv4 REST wants params= as a form field, not a raw JSON body.
+    const form = new URLSearchParams(call.init.body as string);
+    assert.equal(form.get("params"), JSON.stringify({ limit: 1 }));
   });
 
   it("refuses write actions when CIVICRM_ALLOW_WRITES is false", async () => {

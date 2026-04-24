@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file. Format loos
 ### Fixed
 - MCP Registry namespace case-corrected to `io.github.YogiAdhik/civicrm-mcp` to match the canonical GitHub handle (the registry is case-sensitive on the user segment).
 
+## [0.1.2] - 2026-04-24
+
+### Fixed
+- **CRITICAL**: APIv4 REST requests now send parameters as form-urlencoded `params=<json>`, not a raw JSON body. Against a live CiviCRM, the raw-JSON form was silently ignored — every call returned every row, bypassing `select`, `where`, and `limit`. The docs snippet at docs.civicrm.org (which shows `-d '{...}'`) implies JSON works; it does not.
+- `civicrm_system_info` used `System.get`, which does not exist in APIv4. Replaced with `Domain.get` for version + `Extension.get` for installed-extension count.
+- Integration-test mock server now understands form-urlencoded bodies too.
+
 ## [Unreleased]
 
 ### Added

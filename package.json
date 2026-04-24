@@ -1,6 +1,6 @@
 {
   "name": "civicrm-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "mcpName": "io.github.YogiAdhik/civicrm-mcp",
   "description": "Model Context Protocol server for CiviCRM — AuthX-first, schema-introspected.",
   "license": "MIT",

@@ -37,8 +37,17 @@ export async function startMockCivicrm(handler: MockHandler): Promise<MockCivicr
     const body = Buffer.concat(chunks).toString("utf8");
 
     let params: Record<string, unknown> = {};
+    const contentType = (req.headers["content-type"] as string | undefined) ?? "";
     try {
-      params = body ? JSON.parse(body) : {};
+      if (!body) {
+        params = {};
+      } else if (contentType.includes("application/x-www-form-urlencoded")) {
+        const form = new URLSearchParams(body);
+        const p = form.get("params");
+        params = p ? (JSON.parse(p) as Record<string, unknown>) : {};
+      } else {
+        params = JSON.parse(body) as Record<string, unknown>;
+      }
     } catch {
       params = { _raw: body };
     }

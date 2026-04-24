@@ -37,7 +37,7 @@ export class CivicrmClient {
     });
 
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
       "X-Requested-With": "XMLHttpRequest",
       Accept: "application/json",
     };
@@ -49,18 +49,17 @@ export class CivicrmClient {
       }
     }
 
-    const body =
-      this.cfg.authMode === "legacy"
-        ? new URLSearchParams({
-            params: JSON.stringify(params),
-            api_key: this.cfg.apiKey,
-            ...(this.cfg.siteKey ? { key: this.cfg.siteKey } : {}),
-          }).toString()
-        : JSON.stringify(params);
-
+    // APIv4 REST expects params as a form-urlencoded `params` field, not a raw
+    // JSON body — despite what the docs snippet implies. Legacy mode additionally
+    // carries the api_key / site_key as form fields.
+    const bodyFields: Record<string, string> = {
+      params: JSON.stringify(params),
+    };
     if (this.cfg.authMode === "legacy") {
-      headers["Content-Type"] = "application/x-www-form-urlencoded";
+      bodyFields.api_key = this.cfg.apiKey;
+      if (this.cfg.siteKey) bodyFields.key = this.cfg.siteKey;
     }
+    const body = new URLSearchParams(bodyFields).toString();
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.cfg.timeoutMs);

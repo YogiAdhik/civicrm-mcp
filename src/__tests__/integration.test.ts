@@ -202,11 +202,17 @@ describe("integration: read tools against a mock CiviCRM", () => {
 
   it("system_info surfaces CiviCRM version and bot contact", async () => {
     mock = await startMockCivicrm((call) => {
-      if (call.entity === "System") {
-        return api4Success([{ version: "5.79.0", cms: "Standalone", php_version: "8.3.0" }]);
+      if (call.entity === "Domain") {
+        return api4Success([{ id: 1, name: "Default Domain", version: "5.79.0" }]);
       }
       if (call.entity === "Contact") {
         return api4Success([{ id: 1, display_name: "MCP Bot" }]);
+      }
+      if (call.entity === "Extension") {
+        return api4Success([
+          { key: "authx", status: "installed", version: "6.13.2" },
+          { key: "civiimport", status: "installed", version: "6.13.2" },
+        ]);
       }
       return api4Success([]);
     });
@@ -219,6 +225,7 @@ describe("integration: read tools against a mock CiviCRM", () => {
     const text = res.content[0]!.text;
     assert.match(text, /CiviCRM: 5\.79\.0/);
     assert.match(text, /Bot contact: #1 MCP Bot/);
+    assert.match(text, /Installed extensions: 2/);
   });
 });
 
