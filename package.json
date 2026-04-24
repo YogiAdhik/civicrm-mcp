@@ -1,0 +1,44 @@
+{
+  "name": "civicrm-mcp",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server for CiviCRM — AuthX-first, schema-introspected.",
+  "license": "MIT",
+  "author": "Yogesh Adhikari",
+  "type": "module",
+  "bin": {
+    "civicrm-mcp": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.23.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "civicrm",
+    "claude",
+    "ai",
+    "crm"
+  ]
+}
