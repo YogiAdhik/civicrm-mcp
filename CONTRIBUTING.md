@@ -43,7 +43,19 @@ Copy `.env.example` to `.env`, fill in the credentials, then run the server unde
 
 ## Releasing
 
+Releases are automated via GitHub Actions. Publishing flow:
+
 1. Bump `version` in `package.json`.
-2. Add an entry at the top of `CHANGELOG.md`.
-3. `git tag vX.Y.Z && git push --tags`.
-4. `npm publish --access public`.
+2. Bump `version` **and** `packages[0].version` in `server.json` to the same value.
+3. Add an entry at the top of `CHANGELOG.md`.
+4. Commit: `git commit -am "Release vX.Y.Z"`.
+5. Tag and push: `git tag vX.Y.Z && git push --follow-tags`.
+
+The `release.yml` workflow then:
+
+- Runs typecheck, build, and tests.
+- Verifies tag matches `package.json` and `server.json` versions.
+- Publishes to npm with `--provenance` (requires `NPM_TOKEN` repo secret).
+- Publishes to the MCP Registry via GitHub OIDC (no secret needed).
+
+**First-time setup only:** add an `NPM_TOKEN` secret (automation token with `publish` scope) under the repo's Settings → Secrets and variables → Actions.

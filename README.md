@@ -64,11 +64,18 @@ Add to your MCP config (`~/Library/Application Support/Claude/claude_desktop_con
 
 ## Tools
 
+**Diagnostics**
+| Tool | What it does |
+| --- | --- |
+| `civicrm_system_info` | Connectivity / version sanity check; resolves the authenticated bot contact. |
+
 **Read**
 | Tool | What it does |
 | --- | --- |
 | `civicrm_find_contacts` | Search contacts by name or primary email. |
 | `civicrm_get_contact` | Fetch one contact by id, with sensible default fields. |
+| `civicrm_get_relationships` | List a contact's relationships with direction resolved. |
+| `civicrm_list_events` | List events (defaults to upcoming only). |
 
 **Introspection**
 | Tool | What it does |
@@ -85,6 +92,7 @@ Add to your MCP config (`~/Library/Application Support/Claude/claude_desktop_con
 | `civicrm_record_contribution` | Record a donation / contribution. |
 | `civicrm_add_to_group` | Add a contact to a group (idempotent). |
 | `civicrm_remove_from_group` | Mark a contact as Removed from a group (preserves history). |
+| `civicrm_register_for_event` | Register a contact for an event (Participant.create). |
 
 **Escape hatch**
 | Tool | What it does |
