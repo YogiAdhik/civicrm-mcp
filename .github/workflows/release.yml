@@ -45,8 +45,22 @@ jobs:
             exit 1
           fi
 
+      - name: Check if version already on npm (idempotent release)
+        id: npm-check
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if npm view "civicrm-mcp@$PKG_VERSION" version >/dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::civicrm-mcp@$PKG_VERSION is already on npm — skipping publish."
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to npm
-        run: npm publish --access public --provenance
+        if: steps.npm-check.outputs.published == 'false'
+        # --provenance is disabled: rekor.sigstore.dev has been flaky (ETIMEDOUT).
+        # Re-enable once upstream is reliable.
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -59,5 +73,14 @@ jobs:
 
       - name: Publish to MCP Registry (GitHub OIDC)
         run: |
+          set -e
           mcp-publisher login github-oidc
-          mcp-publisher publish
+          # Don't fail the whole release if a duplicate version is already indexed.
+          if mcp-publisher publish 2>&1 | tee /tmp/mcp-pub.log; then
+            echo "::notice::Registry publish succeeded."
+          elif grep -qiE "already exists|duplicate" /tmp/mcp-pub.log; then
+            echo "::notice::Version already on MCP Registry — skipping."
+          else
+            cat /tmp/mcp-pub.log
+            exit 1
+          fi
