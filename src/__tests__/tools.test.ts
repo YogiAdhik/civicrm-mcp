@@ -12,6 +12,7 @@ describe("tool registry", () => {
       "civicrm_find_contacts",
       "civicrm_get_contact",
       "civicrm_get_relationships",
+      "civicrm_get_contributions",
       "civicrm_list_events",
       "civicrm_list_entities",
       "civicrm_describe_entity",
@@ -22,6 +23,7 @@ describe("tool registry", () => {
       "civicrm_add_to_group",
       "civicrm_remove_from_group",
       "civicrm_register_for_event",
+      "civicrm_create_membership",
       "civicrm_api4",
     ]) {
       assert.ok(names.has(expected), `missing tool ${expected}`);

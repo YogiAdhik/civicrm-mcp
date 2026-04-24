@@ -1,9 +1,11 @@
 import { api4PassthroughTool } from "./api4-passthrough.js";
 import { createContactTool } from "./create-contact.js";
+import { createMembershipTool } from "./create-membership.js";
 import { describeEntityTool } from "./describe-entity.js";
 import { listEventsTool, registerForEventTool } from "./events.js";
 import { findContactsTool } from "./find-contacts.js";
 import { getContactTool } from "./get-contact.js";
+import { getContributionsTool } from "./get-contributions.js";
 import { getRelationshipsTool } from "./get-relationships.js";
 import { addToGroupTool, removeFromGroupTool } from "./group-membership.js";
 import { listEntitiesTool } from "./list-entities.js";
@@ -22,6 +24,7 @@ export function allTools(): ToolDefinition<any>[] {
     findContactsTool,
     getContactTool,
     getRelationshipsTool,
+    getContributionsTool,
     listEventsTool,
     // Introspection
     listEntitiesTool,
@@ -34,6 +37,7 @@ export function allTools(): ToolDefinition<any>[] {
     addToGroupTool,
     removeFromGroupTool,
     registerForEventTool,
+    createMembershipTool,
     // Passthrough
     api4PassthroughTool,
   ];

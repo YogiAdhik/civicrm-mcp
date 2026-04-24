@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: CiviCRM question
+    url: https://chat.civicrm.org
+    about: Questions about CiviCRM itself (permissions, APIv4, extensions) are better answered by the CiviCRM community.
+  - name: MCP question
+    url: https://modelcontextprotocol.io
+    about: Questions about the Model Context Protocol or specific MCP clients belong with their projects.

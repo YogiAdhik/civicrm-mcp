@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest a new tool, argument, or capability.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the user workflow you want to enable, not the implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: shape
+    attributes:
+      label: Proposed tool / argument shape
+      description: If it's a new tool, sketch the input schema. If it extends an existing one, show the change.
+      render: json
+  - type: dropdown
+    id: write
+    attributes:
+      label: Is this a write operation?
+      options:
+        - "No, read-only"
+        - "Yes, would be gated by CIVICRM_ALLOW_WRITES"
+        - "Yes, destructive (gated by CIVICRM_ALLOW_DELETES)"
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Have you tried the `civicrm_api4` passthrough?
+      description: If yes, what was missing? If no, does the passthrough already cover your case?

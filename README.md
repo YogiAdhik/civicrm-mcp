@@ -75,6 +75,7 @@ Add to your MCP config (`~/Library/Application Support/Claude/claude_desktop_con
 | `civicrm_find_contacts` | Search contacts by name or primary email. |
 | `civicrm_get_contact` | Fetch one contact by id, with sensible default fields. |
 | `civicrm_get_relationships` | List a contact's relationships with direction resolved. |
+| `civicrm_get_contributions` | List contributions with filters (donor, date window, status, type) and running sum. |
 | `civicrm_list_events` | List events (defaults to upcoming only). |
 
 **Introspection**
@@ -93,6 +94,7 @@ Add to your MCP config (`~/Library/Application Support/Claude/claude_desktop_con
 | `civicrm_add_to_group` | Add a contact to a group (idempotent). |
 | `civicrm_remove_from_group` | Mark a contact as Removed from a group (preserves history). |
 | `civicrm_register_for_event` | Register a contact for an event (Participant.create). |
+| `civicrm_create_membership` | Create a Membership record; CiviCRM auto-calculates dates from the type. |
 
 **Escape hatch**
 | Tool | What it does |

@@ -7,13 +7,17 @@ All notable changes to this project will be documented in this file. Format loos
 ### Added
 - `civicrm_system_info` tool — connectivity / version / auth sanity check.
 - `civicrm_get_relationships` — lists a contact's relationships with direction (A→B / B→A) resolved automatically.
+- `civicrm_get_contributions` — filtered contribution history with running sum.
 - `civicrm_list_events` and `civicrm_register_for_event` — CiviEvent read and registration.
+- `civicrm_create_membership` — Membership.create with date auto-calculation.
 - Unit tests for URL builder, config loader, AuthX client (mocked `fetch`), and tool registry.
 - GitHub Actions CI across Node 18 / 20 / 22.
 - Release automation workflow: publishes to npm (with provenance) and the MCP Registry (via GitHub OIDC) on `v*.*.*` tag push.
 - `CONTRIBUTING.md`.
 - `docs/INSTALL_CIVICRM.md` — beginner guide to CiviCRM Standalone via DDEV.
 - `server.json` manifest for the MCP Registry.
+- Integration test harness (in-process mock APIv4 HTTP server) and 10 end-to-end tests covering URL path, Bearer header, PII redaction, relationship direction, contribution totals, event filtering, write gating, and error propagation.
+- `SECURITY.md`, GitHub issue templates (bug, feature), and pull-request template.
 
 ## [0.1.0] - 2026-04-23
 
