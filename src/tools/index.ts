@@ -7,12 +7,15 @@ import { addToGroupTool, removeFromGroupTool } from "./group-membership.js";
 import { listEntitiesTool } from "./list-entities.js";
 import { logActivityTool } from "./log-activity.js";
 import { recordContributionTool } from "./record-contribution.js";
+import { systemInfoTool } from "./system-info.js";
 import type { ToolDefinition } from "./types.js";
 import { updateContactTool } from "./update-contact.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function allTools(): ToolDefinition<any>[] {
   return [
+    // Diagnostics
+    systemInfoTool,
     // Read
     findContactsTool,
     getContactTool,
