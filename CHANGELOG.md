@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-05-18
+
+Safety hardening + capability expansion. Read the new Safety section in the README.
+
+### Added — safety primitives
+
+- **`CIVICRM_ALLOW_GENERIC_API`** env flag. Gates the `civicrm_api4` passthrough independently of `CIVICRM_ALLOW_WRITES`. The typed write tools (`civicrm_update_contact`, etc.) stay narrower; the generic passthrough is the wider blast radius and now needs its own opt-in.
+- **`CIVICRM_DRY_RUN_DEFAULT`** env flag. When `true`, every write/delete action is short-circuited inside the client — the would-be APIv4 call is returned without touching CiviCRM. Reads pass through normally.
+- **`CIVICRM_TOOLS_ENABLED`** and **`CIVICRM_TOOLS_DISABLED`** env flags. Comma-separated allow/deny lists for the tool surface. `DISABLED` wins over `ENABLED`. Matches the GitHub MCP server convention.
+- **Structured audit log** to stderr. One JSON line per tool call: timestamp, tool name, args (with secrets redacted by key pattern), dry-run flag, status, duration, error code/message. Designed for ops review and board-level transparency.
+
+### Added — new tools
+
+- **`civicrm_whoami`** — resolves the bot contact and probes which CiviCRM entities it can read (Contact, Activity, Contribution, Event, Membership, Group, Tag, Note, Case, Mailing, Pledge). Eliminates the #1 setup question ("does my API key have the right permissions?").
+- **`civicrm_list_saved_searches`** and **`civicrm_run_saved_search`** — execute SearchKit `SavedSearch`/`SearchDisplay` queries by name. Lets admins curate complex queries in the CiviCRM UI and have an agent run them safely. Highest-leverage primitive in modern CiviCRM.
+- **`civicrm_describe_field_options`** — return the option list for one field (e.g. valid `activity_type_id` values) without pulling the full entity schema. Significantly cuts tokens for enum-discovery.
+- **`civicrm_add_note`** — attach a free-text Note to a contact, contribution, activity, case, or relationship. Write-gated.
+- **`civicrm_tag_contacts`** and **`civicrm_untag_contacts`** — bulk-tag or untag up to 500 contacts in one call. Accepts a tag id or name. Untag requires `CIVICRM_ALLOW_DELETES=true`.
+- **`civicrm_send_contribution_receipt`** — wraps `Contribution.sendReceipt` (with `sendconfirmation` fallback for older 5.x sites). High-frequency stewardship verb.
+
+### Changed
+
+- README Safety section rewritten as a threat-model story rather than a list of mechanisms. Names prompt-injection risks via tool input *and* tool output; documents the five layers of defence (CiviCRM permissions → env-flag gates → per-call MCP-client approval → response hygiene → stdio-only transport); explicitly clarifies that per-call approval is the MCP client's job, not the server's.
+- `civicrm_system_info` and the startup log line now surface the new flags (`allowGenericApi`, `dryRunDefault`, tool allowlist size).
+
+### Notes
+
+- This is a small breaking change for anyone already using `civicrm_api4` — they will need to set `CIVICRM_ALLOW_GENERIC_API=true` in addition to the existing `CIVICRM_ALLOW_WRITES`/`CIVICRM_ALLOW_DELETES` flags they had.
+- Documented CiviCRM floor is unchanged at 5.47 but realistic-modern target is 6.10 ESR (PHP 8.0+). See `RESEARCH.md` 2026-05 addendum for the 6.x landscape.
+
 ## [0.1.1] - 2026-04-24
 
 ### Fixed

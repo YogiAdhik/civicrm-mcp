@@ -204,7 +204,60 @@ Introspection:
 3. Do we want to publish to npm under the user's name/org, or keep private?
 4. Desired MCP transport: stdio-only (local clients) or also HTTP (n8n, Zapier-alike)?
 
-## 12. Sources
+## 12. Addendum — 2026-05-18 refresh
+
+Sections 1–11 above are the April 2026 baseline and still authoritative on fundamentals. This addendum captures what changed under us and what we shipped in response.
+
+### What changed in CiviCRM (5.x → 6.x)
+
+- CiviCRM 6.0 (Mar 2025) raised the floor to **PHP 8.0** and introduced `SiteEmailAddress` (replacing the legacy `from_email_address` option group).
+- **6.10** (Jan 2026) is the current ESR; `CIVICRM_CRED_KEYS` is now mandatory.
+- **6.11** (Feb 2026) added a new `PledgeBlock` APIv4 entity and AuthX now validates the CMS user isn't blocked before honouring REST auth — 401s should be treated as "rotate key", not transient.
+- **6.12** (Mar 2026) — `Order.create` now accepts entity names and supports recurring; new `SearchKit.GetMarkup` action.
+- **6.13** (Apr 2026) — first-class `ContributionRecur.cancelSubscription` and `updateAmountOnRecur` actions (previously had to be faked). `MembershipPayment` API formally deprecated. Form Builder + AdminUI default on new installs.
+
+### Implications for the MCP server
+
+- `Order.create` is the correct write surface for any contribution with line items, soft credits, memberships, or event participants. Our current `civicrm_record_contribution` writes a bare Contribution and bypasses LineItem/FinancialItem integrity — a follow-up `civicrm_create_order` tool is the right successor.
+- `ContributionRecur.cancelSubscription` / `updateAmountOnRecur` should each get their own typed tool; previously this required a `civicrm_api4` passthrough call.
+- `SearchDisplay.run` is the highest-leverage agent primitive in modern CiviCRM. Admins author queries in the UI; we just execute them. Shipped as `civicrm_run_saved_search` in v0.2.0.
+
+### What v0.2.0 shipped (this addendum's reason for being)
+
+Safety primitives:
+- `CIVICRM_ALLOW_GENERIC_API` env flag to gate the `civicrm_api4` passthrough independently of the typed writes.
+- `CIVICRM_DRY_RUN_DEFAULT` env flag — when true, writes/deletes are short-circuited inside the client and returned to the agent as a "would-have-called" envelope.
+- `CIVICRM_TOOLS_ENABLED` / `CIVICRM_TOOLS_DISABLED` per-tool allowlist, matching the GitHub MCP convention.
+- Structured audit log to stderr (one JSON line per tool call, secrets redacted by key pattern).
+
+New tools:
+- `civicrm_whoami` — bot diagnostic that probes read access across common entities.
+- `civicrm_list_saved_searches` + `civicrm_run_saved_search` — SearchKit execution.
+- `civicrm_describe_field_options` — single-field option list.
+- `civicrm_add_note`, `civicrm_tag_contacts`, `civicrm_untag_contacts`, `civicrm_send_contribution_receipt`.
+
+### What remains on the next-up list
+
+- `civicrm_create_order` (the correct line-item-aware write surface).
+- `civicrm_cancel_recurring`, `civicrm_update_recurring_amount` (native 6.13 actions).
+- `civicrm_send_email_to_contact` via the E-mail API extension.
+- CiviCase surface: `civicrm_open_case`, `civicrm_list_cases`, `civicrm_log_case_activity`.
+- MCP `resources/` — `civicrm://schema/{entity}`, `civicrm://options/{group}`, `civicrm://custom-groups/{entity}`, `civicrm://saved-searches`.
+- `civicrm_get_contact_timeline` — merged Activity+Contribution+Membership+Case feed.
+- Multi-site config (`CIVICRM_SITES_JSON` + per-call `site` arg).
+- Rate limiting per tool.
+- MCP elicitation for destructive verbs (merge, delete, Mailing.send, Job.execute).
+- HTTP/SSE transport + Docker image.
+
+### Comparable projects (May 2026)
+
+- `johncallhub/civicrm-mcp-server` — the only other CiviCRM MCP. ~11 tools, JS, stdio. Has custom-field discovery for Contact/Activity/Contribution. Gaps vs. ours: no AuthX guard awareness, no introspection of arbitrary entities, no escape-hatch passthrough, no write gating.
+- `n8n-nodes-civicrm` by iXiam — community n8n node, positioned by civicrm.org as the no-code agentic option.
+- Pipedream CiviCRM MCP — hosted.
+
+The wedge we can credibly own: schema-driven, safety primitives, SavedSearch- and Afform-driven writes, CiviCase + correct Order API.
+
+## 13. Sources
 
 - CiviCRM Developer Guide — API overview, APIv4 usage, REST, actions, chaining.
 - CiviCRM System Administrator Guide — API keys, site keys, AuthX.
