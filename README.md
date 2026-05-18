@@ -74,6 +74,7 @@ Consult your client's documentation for where its MCP config file lives.
 | Tool | What it does |
 | --- | --- |
 | `civicrm_system_info` | Connectivity / version sanity check; resolves the authenticated bot contact. |
+| `civicrm_whoami` | Resolves the bot contact and probes which entities it can read. Use this first when setting up. |
 
 **Read**
 | Tool | What it does |
@@ -83,12 +84,15 @@ Consult your client's documentation for where its MCP config file lives.
 | `civicrm_get_relationships` | List a contact's relationships with direction resolved. |
 | `civicrm_get_contributions` | List contributions with filters (donor, date window, status, type) and running sum. |
 | `civicrm_list_events` | List events (defaults to upcoming only). |
+| `civicrm_list_saved_searches` | Discover SearchKit SavedSearches the admin has built. |
+| `civicrm_run_saved_search` | Execute a SavedSearch by name via `SearchDisplay.run`. Safest way to run complex queries. |
 
 **Introspection**
 | Tool | What it does |
 | --- | --- |
 | `civicrm_list_entities` | List every APIv4 entity available on the install (incl. extensions). |
 | `civicrm_describe_entity` | Return fields + actions for an entity. Call this before `civicrm_api4` if unsure. |
+| `civicrm_describe_field_options` | Return the option list (enum values) for one field — cheaper than a full entity describe. |
 
 **Write (require `CIVICRM_ALLOW_WRITES=true`)**
 | Tool | What it does |
@@ -101,6 +105,10 @@ Consult your client's documentation for where its MCP config file lives.
 | `civicrm_remove_from_group` | Mark a contact as Removed from a group (preserves history). |
 | `civicrm_register_for_event` | Register a contact for an event (Participant.create). |
 | `civicrm_create_membership` | Create a Membership record; CiviCRM auto-calculates dates from the type. |
+| `civicrm_add_note` | Attach a free-text Note to a contact, contribution, activity, case, or relationship. |
+| `civicrm_tag_contacts` | Add a tag to up to 500 contacts in one call (idempotent). |
+| `civicrm_untag_contacts` | Remove a tag from contacts. Also requires `CIVICRM_ALLOW_DELETES=true`. |
+| `civicrm_send_contribution_receipt` | Trigger (or re-send) the standard receipt email for a contribution. |
 
 **Escape hatch (off by default)**
 | Tool | What it does |
@@ -145,9 +153,10 @@ This is what an admin shows their board when asked "what did the AI do on our do
 
 ### Operational guidance
 
-- Start with `CIVICRM_ALLOW_WRITES=false` and run only the read tools.
+- Start with `CIVICRM_ALLOW_WRITES=false` and run only the read tools. Use `civicrm_whoami` to verify the bot's read permissions.
 - When you do turn writes on, set `CIVICRM_DRY_RUN_DEFAULT=true` for a week. Watch the audit log. Then flip dry-run off.
 - Prefer the typed write tools over `civicrm_api4`. They have narrower schemas and clearer intent in approval prompts.
+- Prefer `civicrm_run_saved_search` over hand-authored APIv4 queries when an admin has already built the right SearchKit search in the UI.
 - Treat tool output as untrusted text when you read it back in chat — especially long free-text fields (notes, activity details, custom fields).
 - For production deployments, keep the bot contact on a separate CMS user from any human admin, so its API key can be rotated or revoked independently.
 

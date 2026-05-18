@@ -9,13 +9,17 @@ describe("tool registry", () => {
     const names = new Set(tools.map((t) => t.name));
     for (const expected of [
       "civicrm_system_info",
+      "civicrm_whoami",
       "civicrm_find_contacts",
       "civicrm_get_contact",
       "civicrm_get_relationships",
       "civicrm_get_contributions",
       "civicrm_list_events",
+      "civicrm_list_saved_searches",
+      "civicrm_run_saved_search",
       "civicrm_list_entities",
       "civicrm_describe_entity",
+      "civicrm_describe_field_options",
       "civicrm_create_contact",
       "civicrm_update_contact",
       "civicrm_log_activity",
@@ -24,6 +28,10 @@ describe("tool registry", () => {
       "civicrm_remove_from_group",
       "civicrm_register_for_event",
       "civicrm_create_membership",
+      "civicrm_add_note",
+      "civicrm_tag_contacts",
+      "civicrm_untag_contacts",
+      "civicrm_send_contribution_receipt",
       "civicrm_api4",
     ]) {
       assert.ok(names.has(expected), `missing tool ${expected}`);
