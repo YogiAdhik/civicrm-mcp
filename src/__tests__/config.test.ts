@@ -17,7 +17,14 @@ describe("loadConfig", () => {
     assert.equal(cfg.authMode, "authx");
     assert.equal(cfg.allowWrites, false);
     assert.equal(cfg.allowDeletes, false);
+    assert.equal(cfg.allowGenericApi, false);
     assert.equal(cfg.timeoutMs, 30_000);
+  });
+
+  it("interprets the generic-API flag independently of writes", () => {
+    const cfg = loadConfig(env({ CIVICRM_ALLOW_GENERIC_API: "true" }));
+    assert.equal(cfg.allowGenericApi, true);
+    assert.equal(cfg.allowWrites, false);
   });
 
   it("strips trailing slashes from base URL", () => {

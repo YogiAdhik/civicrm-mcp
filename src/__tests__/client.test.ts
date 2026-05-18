@@ -11,6 +11,7 @@ const baseConfig: Config = {
   authMode: "authx",
   allowWrites: false,
   allowDeletes: false,
+  allowGenericApi: false,
   timeoutMs: 5_000,
 };
 

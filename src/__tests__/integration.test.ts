@@ -2,6 +2,7 @@ import { strict as assert } from "node:assert";
 import { afterEach, describe, it } from "node:test";
 import { CivicrmClient } from "../civicrm/client.js";
 import type { Config } from "../config.js";
+import { api4PassthroughTool } from "../tools/api4-passthrough.js";
 import { findContactsTool } from "../tools/find-contacts.js";
 import { getContactTool } from "../tools/get-contact.js";
 import { getContributionsTool } from "../tools/get-contributions.js";
@@ -26,6 +27,7 @@ function cfg(base: string, overrides: Partial<Config> = {}): Config {
     authMode: "authx",
     allowWrites: false,
     allowDeletes: false,
+    allowGenericApi: false,
     timeoutMs: 5_000,
     ...overrides,
   };
@@ -292,6 +294,52 @@ describe("integration: write tools respect gating", () => {
       { client, config },
     );
     assert.match(res.content[0]!.text, /Registered contact #1 for event #2/);
+  });
+
+  it("api4 passthrough refuses when CIVICRM_ALLOW_GENERIC_API is false", async () => {
+    mock = await startMockCivicrm(() => api4Success([]));
+    const config = cfg(mock.url, { allowWrites: true, allowDeletes: true });
+    const client = new CivicrmClient(config);
+    const res = await api4PassthroughTool.handler(
+      { entity: "Contact", action: "get", params: { limit: 1 } },
+      { client, config },
+    );
+    assert.equal(res.isError, true);
+    assert.match(res.content[0]!.text, /CIVICRM_ALLOW_GENERIC_API/);
+    assert.equal(mock.calls.length, 0, "must not hit the network");
+  });
+
+  it("api4 passthrough works when CIVICRM_ALLOW_GENERIC_API is true", async () => {
+    mock = await startMockCivicrm((call) => {
+      assert.equal(call.entity, "Contact");
+      assert.equal(call.action, "get");
+      return api4Success([{ id: 1, display_name: "Test" }]);
+    });
+    const config = cfg(mock.url, { allowGenericApi: true });
+    const client = new CivicrmClient(config);
+    const res = await api4PassthroughTool.handler(
+      { entity: "Contact", action: "get", params: { limit: 1 } },
+      { client, config },
+    );
+    assert.equal(res.isError, undefined);
+    assert.match(res.content[0]!.text, /Contact\.get/);
+  });
+
+  it("typed write tools work without CIVICRM_ALLOW_GENERIC_API", async () => {
+    mock = await startMockCivicrm(() => api4Success([{ id: 9 }]));
+    const config = cfg(mock.url, { allowWrites: true, allowGenericApi: false });
+    const client = new CivicrmClient(config);
+    const res = await logActivityTool.handler(
+      {
+        target_contact_id: 1,
+        activity_type: "Phone Call",
+        subject: "test",
+        status: "Completed",
+      },
+      { client, config },
+    );
+    assert.equal(res.isError, undefined);
+    assert.equal(mock.calls.length, 1);
   });
 
   it("surfaces a server-side APIv4 error as CivicrmError in the tool handler", async () => {

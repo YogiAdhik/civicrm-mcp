@@ -11,7 +11,8 @@ async function main(): Promise<void> {
   // stderr is fine — stdout is reserved for the MCP protocol.
   process.stderr.write(
     `[civicrm-mcp] connected — base=${config.baseUrl} cms=${config.cms} ` +
-      `writes=${config.allowWrites} deletes=${config.allowDeletes}\n`,
+      `writes=${config.allowWrites} deletes=${config.allowDeletes} ` +
+      `genericApi=${config.allowGenericApi}\n`,
   );
 }
 

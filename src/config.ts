@@ -17,6 +17,10 @@ const EnvSchema = z.object({
     .string()
     .optional()
     .transform((v) => v === "true" || v === "1"),
+  CIVICRM_ALLOW_GENERIC_API: z
+    .string()
+    .optional()
+    .transform((v) => v === "true" || v === "1"),
   CIVICRM_TIMEOUT_MS: z
     .string()
     .optional()
@@ -34,6 +38,7 @@ export interface Config {
   authMode: AuthMode;
   allowWrites: boolean;
   allowDeletes: boolean;
+  allowGenericApi: boolean;
   timeoutMs: number;
 }
 
@@ -54,6 +59,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     authMode: e.CIVICRM_AUTH_MODE,
     allowWrites: e.CIVICRM_ALLOW_WRITES ?? false,
     allowDeletes: e.CIVICRM_ALLOW_DELETES ?? false,
+    allowGenericApi: e.CIVICRM_ALLOW_GENERIC_API ?? false,
     timeoutMs: e.CIVICRM_TIMEOUT_MS,
   };
 }

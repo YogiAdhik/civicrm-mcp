@@ -59,6 +59,7 @@ export const systemInfoTool: ToolDefinition<typeof InputSchema> = {
       `Auth mode: ${config.authMode}`,
       `Writes: ${config.allowWrites ? "enabled" : "disabled"}`,
       `Deletes: ${config.allowDeletes ? "enabled" : "disabled"}`,
+      `Generic APIv4 passthrough: ${config.allowGenericApi ? "enabled" : "disabled"}`,
       bot
         ? `Bot contact: #${bot.id} ${bot.display_name ?? ""}`.trim()
         : "Bot contact: (could not resolve)",
@@ -75,6 +76,7 @@ export const systemInfoTool: ToolDefinition<typeof InputSchema> = {
         authMode: config.authMode,
         allowWrites: config.allowWrites,
         allowDeletes: config.allowDeletes,
+        allowGenericApi: config.allowGenericApi,
       },
     });
   },
