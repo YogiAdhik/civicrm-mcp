@@ -29,6 +29,20 @@ export class CivicrmClient {
   ): Promise<Api4Success<T>> {
     this.assertActionAllowed(action);
 
+    // Dry-run short-circuit. Reads pass through (dry-running a read is
+    // pointless), but writes and deletes return a synthetic success without
+    // touching CiviCRM. The intended call is surfaced in the response body so
+    // the agent and the audit log both see exactly what *would* have happened.
+    if (this.cfg.dryRunDefault && (isWriteAction(action) || isDeleteAction(action))) {
+      return {
+        version: 4,
+        count: 0,
+        values: [],
+        dryRun: { entity, action, params },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any as Api4Success<T>;
+    }
+
     const url = buildApi4Url({
       baseUrl: this.cfg.baseUrl,
       cms: this.cfg.cms,

@@ -21,6 +21,12 @@ const EnvSchema = z.object({
     .string()
     .optional()
     .transform((v) => v === "true" || v === "1"),
+  CIVICRM_DRY_RUN_DEFAULT: z
+    .string()
+    .optional()
+    .transform((v) => v === "true" || v === "1"),
+  CIVICRM_TOOLS_ENABLED: z.string().optional(),
+  CIVICRM_TOOLS_DISABLED: z.string().optional(),
   CIVICRM_TIMEOUT_MS: z
     .string()
     .optional()
@@ -39,7 +45,18 @@ export interface Config {
   allowWrites: boolean;
   allowDeletes: boolean;
   allowGenericApi: boolean;
+  dryRunDefault: boolean;
+  toolsEnabled: string[] | null;
+  toolsDisabled: string[];
   timeoutMs: number;
+}
+
+function parseToolList(raw: string | undefined): string[] {
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
@@ -60,6 +77,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     allowWrites: e.CIVICRM_ALLOW_WRITES ?? false,
     allowDeletes: e.CIVICRM_ALLOW_DELETES ?? false,
     allowGenericApi: e.CIVICRM_ALLOW_GENERIC_API ?? false,
+    dryRunDefault: e.CIVICRM_DRY_RUN_DEFAULT ?? false,
+    toolsEnabled: e.CIVICRM_TOOLS_ENABLED ? parseToolList(e.CIVICRM_TOOLS_ENABLED) : null,
+    toolsDisabled: parseToolList(e.CIVICRM_TOOLS_DISABLED),
     timeoutMs: e.CIVICRM_TIMEOUT_MS,
   };
 }

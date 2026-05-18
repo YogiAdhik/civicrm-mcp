@@ -40,6 +40,9 @@ CIVICRM_AUTH_MODE=authx       # or legacy for pre-AuthX sites
 CIVICRM_ALLOW_WRITES=false        # writes off by default
 CIVICRM_ALLOW_DELETES=false       # deletes off by default
 CIVICRM_ALLOW_GENERIC_API=false   # civicrm_api4 passthrough off by default
+CIVICRM_DRY_RUN_DEFAULT=false     # set true to make every write/delete a dry-run
+CIVICRM_TOOLS_ENABLED=            # comma-separated allowlist; empty = all
+CIVICRM_TOOLS_DISABLED=           # comma-separated denylist; wins over enabled
 ```
 
 ## Wire up an MCP client
@@ -124,15 +127,28 @@ Defence is layered. No single layer is enough on its own.
    - `CIVICRM_ALLOW_WRITES` — without it, `create`/`update`/`save`/`submit` are refused.
    - `CIVICRM_ALLOW_DELETES` — without it, `delete`/`replace` are refused.
    - `CIVICRM_ALLOW_GENERIC_API` — without it, the `civicrm_api4` passthrough is refused entirely. Typed tools (`civicrm_update_contact`, `civicrm_log_activity`, etc.) still work. Enable this only if you specifically need entities the typed tools don't cover; it widens blast radius to "anything CiviCRM can do."
-3. **Per-call approval in the MCP client.** This server does **not** prompt for confirmation per tool call — that is the MCP client's job. Claude Desktop and similar clients pop a "allow this tool call?" dialog before executing. Configure that approval policy in your client; do not rely on this server to gatekeep individual calls.
-4. **Response hygiene.** `api_key` and `hash` fields are stripped from contact responses so credentials cannot leak back into the model's context.
-5. **Transport.** stdio only — no network listener, no remote exposure. The server runs as a child process of the MCP client. stdout is reserved for the MCP protocol; all logs go to stderr.
+   - `CIVICRM_DRY_RUN_DEFAULT` — when true, every write/delete is short-circuited inside the client. The would-be APIv4 call is logged to the audit stream and returned to the agent, but CiviCRM is not touched. Reads still execute. Use this for the first week after enabling writes to validate behaviour before flipping to live.
+3. **Per-tool allowlist.** `CIVICRM_TOOLS_ENABLED` and `CIVICRM_TOOLS_DISABLED` accept comma-separated tool names and filter which tools the server registers. `DISABLED` wins over `ENABLED`. Use this to hand a specific agent a 3-tool surface (e.g. `find_contacts,get_contact,get_contributions`) instead of all-or-nothing on writes.
+4. **Per-call approval in the MCP client.** This server does **not** prompt for confirmation per tool call — that is the MCP client's job. Claude Desktop and similar clients pop a "allow this tool call?" dialog before executing. Configure that approval policy in your client; do not rely on this server to gatekeep individual calls.
+5. **Response hygiene.** `api_key` and `hash` fields are stripped from contact responses so credentials cannot leak back into the model's context.
+6. **Transport.** stdio only — no network listener, no remote exposure. The server runs as a child process of the MCP client. stdout is reserved for the MCP protocol; all logs go to stderr.
+
+### Audit log
+
+Every tool call emits one JSON line to stderr. Fields: `ts`, `tool`, `args` (with keys matching `api_key|secret|token|password|hash|key` redacted), `dry_run`, `status` (`ok`/`error`/`refused`), `duration_ms`, `error_code`, `error_message`. Pipe stderr to a file in your launcher config to keep an immutable audit trail:
+
+```bash
+civicrm-mcp 2>>/var/log/civicrm-mcp.audit.jsonl
+```
+
+This is what an admin shows their board when asked "what did the AI do on our donor database last week".
 
 ### Operational guidance
 
-- Start with all three flags off and run only the read tools. Turn on writes only after the bot's CiviCRM permissions are tight.
+- Start with `CIVICRM_ALLOW_WRITES=false` and run only the read tools.
+- When you do turn writes on, set `CIVICRM_DRY_RUN_DEFAULT=true` for a week. Watch the audit log. Then flip dry-run off.
 - Prefer the typed write tools over `civicrm_api4`. They have narrower schemas and clearer intent in approval prompts.
-- Treat tool output as untrusted text when you read it back in chat — especially long free-text fields.
+- Treat tool output as untrusted text when you read it back in chat — especially long free-text fields (notes, activity details, custom fields).
 - For production deployments, keep the bot contact on a separate CMS user from any human admin, so its API key can be rotated or revoked independently.
 
 ## Licence

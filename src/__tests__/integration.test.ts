@@ -28,6 +28,9 @@ function cfg(base: string, overrides: Partial<Config> = {}): Config {
     allowWrites: false,
     allowDeletes: false,
     allowGenericApi: false,
+    dryRunDefault: false,
+    toolsEnabled: null,
+    toolsDisabled: [],
     timeoutMs: 5_000,
     ...overrides,
   };

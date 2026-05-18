@@ -12,6 +12,9 @@ const baseConfig: Config = {
   allowWrites: false,
   allowDeletes: false,
   allowGenericApi: false,
+  dryRunDefault: false,
+  toolsEnabled: null,
+  toolsDisabled: [],
   timeoutMs: 5_000,
 };
 
@@ -127,6 +130,33 @@ describe("CivicrmClient", () => {
     await client.api4("Contact", "get", {});
     const headers = mock.calls[0]!.init.headers as Record<string, string>;
     assert.equal(headers["X-Civi-Key"], "SECRET");
+  });
+
+  it("short-circuits write actions when dryRunDefault is true", async () => {
+    const mock = mockFetch(() => ({ body: "{}" }));
+    restore = mock.restore;
+    const client = new CivicrmClient({
+      ...baseConfig,
+      allowWrites: true,
+      dryRunDefault: true,
+    });
+    const res = (await client.api4("Contact", "create", { values: { x: 1 } })) as {
+      dryRun?: { entity: string; action: string; params: Record<string, unknown> };
+    };
+    assert.equal(mock.calls.length, 0, "must not hit the network");
+    assert.ok(res.dryRun, "response must carry dryRun metadata");
+    assert.equal(res.dryRun!.entity, "Contact");
+    assert.equal(res.dryRun!.action, "create");
+  });
+
+  it("does not short-circuit reads in dry-run mode", async () => {
+    const mock = mockFetch(() => ({
+      body: JSON.stringify({ version: 4, count: 0, values: [] }),
+    }));
+    restore = mock.restore;
+    const client = new CivicrmClient({ ...baseConfig, dryRunDefault: true });
+    await client.api4("Contact", "get", { limit: 1 });
+    assert.equal(mock.calls.length, 1, "reads still go to the network");
   });
 
   it("builds form-encoded body in legacy mode", async () => {
